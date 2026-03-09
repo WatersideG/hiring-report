@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waterside Group — Hiring Intelligence Report</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1F3864;--blue:#2F5496;--light-blue:#DAEEF3;--green:#C6EFCE;--green-dark:#006100;--yellow:#FFF2CC;--yellow-dark:#B8860B;--red-light:#FCE4EC;--gray:#F2F2F2;--orange:#FDE9D9;--purple:#E4DFEC;--text:#1a1a1a;--text-light:#555;--border:#ddd;--card-shadow:0 2px 8px rgba(0,0,0,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f6fa;color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:24px 20px;border-radius:12px;margin-bottom:20px}
+.header h1{font-size:1.3rem;font-weight:700;margin-bottom:4px}
+.header p{font-size:.82rem;opacity:.85}
+.header .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.badge{background:rgba(255,255,255,.18);padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;letter-spacing:.3px}
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:var(--card-shadow)}
+.stat-card .num{font-size:1.6rem;font-weight:700;color:var(--navy)}
+.stat-card .label{font-size:.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px}
+.tabs{display:flex;overflow-x:auto;gap:4px;margin-bottom:16px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.tab{padding:8px 16px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;background:#fff;border:1px solid var(--border);color:var(--text-light);transition:all .2s}
+.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.filter-bar input{flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem}
+.filter-bar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;background:#fff}
+.filter-bar .count{font-size:.78rem;color:var(--text-light);margin-left:auto}
+.card-list{display:flex;flex-direction:column;gap:10px}
+.cand-card{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:var(--card-shadow);border-left:4px solid var(--navy);cursor:pointer;transition:box-shadow .2s}
+.cand-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.cand-card.tier-1{border-left-color:var(--green-dark)}
+.cand-card.tier-2{border-left-color:var(--yellow-dark)}
+.cand-card.tier-3{border-left-color:var(--blue)}
+.cand-card.tier-4{border-left-color:#999}
+.cand-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cand-rank{font-size:1.1rem;font-weight:800;color:var(--navy);min-width:28px}
+.cand-name{font-weight:600;font-size:.95rem;flex:1}
+.cand-score{background:var(--navy);color:#fff;padding:2px 10px;border-radius:16px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.cand-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cand-tag{padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:600}
+.tag-team{background:#E8EAF6;color:#283593}
+.tag-degree{background:#F3E5F5;color:#6A1B9A}
+.tag-gpa{background:#E8F5E9;color:#2E7D32}
+.tag-exp{background:#FFF3E0;color:#E65100}
+.tag-status-scheduled{background:var(--purple);color:#7030A0}
+.tag-status-invited{background:var(--light-blue);color:#0070C0}
+.tag-status-none{background:var(--gray);color:#888}
+.tag-worksample{background:#FFECB3;color:#F57F17}
+.tag-linkedin{background:#E3F2FD;color:#1565C0}
+.cand-signals{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px}
+.signal{text-align:center;padding:4px;border-radius:6px;background:var(--gray)}
+.signal .s-val{font-weight:700;font-size:.9rem;color:var(--navy)}
+.signal .s-label{font-size:.6rem;color:var(--text-light);text-transform:uppercase}
+.cand-detail{margin-top:10px;font-size:.82rem;color:var(--text-light);display:none;border-top:1px solid var(--border);padding-top:10px}
+.cand-detail.open{display:block}
+.detail-row{margin-bottom:6px}
+.detail-row strong{color:var(--text);font-size:.78rem}
+.detail-row span{display:block;margin-top:2px}
+.team-section{margin-bottom:20px}
+.team-header{background:var(--navy);color:#fff;padding:12px 16px;border-radius:10px 10px 0 0;font-weight:700;font-size:.9rem}
+.team-header small{display:block;font-weight:400;font-size:.72rem;opacity:.8;margin-top:2px}
+.team-body{background:#fff;border-radius:0 0 10px 10px;box-shadow:var(--card-shadow)}
+.team-member{padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.team-member:last-child{border-bottom:none}
+.team-role{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;min-width:70px;text-align:center}
+.role-primary{background:var(--green);color:var(--green-dark)}
+.role-alt{background:var(--yellow);color:var(--yellow-dark)}
+.tm-name{font-weight:600;font-size:.88rem;flex:1}
+.tm-score{font-weight:700;color:var(--navy);font-size:.88rem}
+.algo-card{background:#fff;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:var(--card-shadow)}
+.algo-card h3{font-size:.95rem;color:var(--navy);margin-bottom:8px}
+.algo-card p{font-size:.82rem;color:var(--text-light);margin-bottom:4px}
+.algo-signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.algo-signal{border-radius:8px;padding:12px;border:1px solid var(--border)}
+.algo-signal .sig-name{font-weight:700;font-size:.82rem;color:var(--navy)}
+.algo-signal .sig-max{font-size:1.4rem;font-weight:800;color:var(--blue);margin:4px 0}
+.algo-signal .sig-desc{font-size:.72rem;color:var(--text-light)}
+.revision-banner{background:#FFF9C4;border:1px solid #F9A825;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.82rem}
+.revision-banner strong{color:#F57F17}
+.risk-card{background:#fff;border-radius:10px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--card-shadow);border-left:4px solid var(--border)}
+.risk-card.sev-high{border-left-color:#D32F2F}
+.risk-card.sev-medium{border-left-color:#F9A825}
+.risk-card.sev-low{border-left-color:#66BB6A}
+.risk-title{font-weight:700;font-size:.88rem;margin-bottom:4px}
+.risk-desc{font-size:.8rem;color:var(--text-light)}
+.risk-action{font-size:.78rem;margin-top:6px;padding:6px 10px;background:var(--gray);border-radius:6px}
+.footer{text-align:center;padding:20px;font-size:.72rem;color:#999;margin-top:20px}
+.hidden{display:none!important}
+@media(max-width:600px){
+  .container{padding:10px}
+  .header h1{font-size:1.1rem}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .algo-signal-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Waterside Group — Hiring Intelligence Report</h1>
+    <p>Software Engineer Co-op, Fall 2026 (July-December) — 10 Positions</p>
+    <div class="badge-row">
+      <span class="badge">50 Candidates Ranked</span>
+      <span class="badge">4 Workstreams</span>
+      <span class="badge">323 Total Applicants</span>
+      <span class="badge">Updated 3/8/2026</span>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-card"><div class="num">50</div><div class="label">Ranked Candidates</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="label">Interviews Scheduled</div></div>
+    <div class="stat-card"><div class="num">6</div><div class="label">Invitations Sent</div></div>
+    <div class="stat-card"><div class="num">11</div><div class="label">Work Samples</div></div>
+    <div class="stat-card"><div class="num">88</div><div class="label">Top Score</div></div>
+    <div class="stat-card"><div class="num">29</div><div class="label">LinkedIn Verified</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showView('ranking')">Rankings</div>
+    <div class="tab" onclick="showView('teams')">Teams</div>
+    <div class="tab" onclick="showView('algorithm')">Algorithm</div>
+    <div class="tab" onclick="showView('risks')">Risks</div>
+  </div>
+  <div id="view-ranking">
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="Search candidates..." oninput="filterCandidates()">
+      <select id="teamFilter" onchange="filterCandidates()"><option value="">All Teams</option><option value="A:">Team A: AI</option><option value="B:">Team B: Website</option><option value="C:">Team C: Mobile</option><option value="D:">Team D: Marketing</option><option value="E:">Team E: DS/AI</option></select>
+      <select id="statusFilter" onchange="filterCandidates()"><option value="">All Status</option><option value="Scheduled">Scheduled</option><option value="Invited">Invited</option><option value="None">No Contact</option></select>
+      <span class="count" id="resultCount">50 candidates</span>
+    </div>
+    <div class="card-list" id="candidateList"></div>
+  </div>
+  <div id="view-teams" class="hidden"></div>
+  <div id="view-algorithm" class="hidden"></div>
+  <div id="view-risks" class="hidden"></div>
+  <div class="footer">Waterside Group — Confidential Hiring Intelligence<br>Generated 3/8/2026 — Composite Scoring Algorithm V2 (Revised)</div>
+</div>
+<script>
+const candidates=[
+{r:1,n:"Ansh Sumeet Sarin",c:88,s1:28,s2:22,s3:20,s4:18,gpa:"3.84",exp:14,deg:"MS CS",t1:"B: Website/Frontend",t2:"A: AI",src:"Both Evals",val:"3-Source",st:"Invited 3/8",diff:"Consensus #1. Triple-framework frontend (React/Vue/Angular). GTA for Foundations of SWE.",iq:"Walk us through choosing between React, Vue, and Angular for a project.",li:"linkedin.com/in/anshsarin13",ws:false},
+{r:2,n:"Sankar Sudheer Ayachitula",c:84,s1:18,s2:22,s3:24,s4:20,gpa:"4.00",exp:42,deg:"MS CS",t1:"C: Mobile",t2:"B: Backend",src:"Both Evals",val:"3-Source+WS",st:"Scheduled 3/16 3:00 PM",diff:"Perfect 4.0 GPA. 3.5yr Bajaj Finserv Android (100M+ users). Work sample submitted.",iq:"Our apps use React Native, not native Android. How quickly could you become productive?",li:"Verified",ws:true},
+{r:3,n:"Jaiman Pandya",c:82,s1:24,s2:20,s3:22,s4:16,gpa:"",exp:18,deg:"BS CS+Math",t1:"A: AI/Agentic",t2:"B: Website",src:"New Apps",val:"Provisional+LI",st:"Scheduled 3/16 3:25 PM",diff:"YC-backed startup engineer (AskVita, $180K seed). CS+Math dual at NEU.",iq:"Tell us about building AskVita at a YC startup. What technical decisions did you own?",li:"Verified",ws:false},
+{r:4,n:"Thejesh Mundlapati",c:78,s1:22,s2:20,s3:18,s4:18,gpa:"3.70",exp:10,deg:"MS CS",t1:"B: Website/Backend",t2:"A: AI",src:"New Apps",val:"3-Source+WS",st:"None",diff:"Backend SWE at NU Launch Labs (Django/DRF/PostgreSQL). Work sample maps to Waterside use cases.",iq:"Your NU Launch Labs work uses Django + DRF. How would you build RESTful APIs for WordPress?",li:"Verified",ws:true},
+{r:5,n:"Tsung-Yueh (Eric) Lai",c:76,s1:26,s2:8,s3:23,s4:19,gpa:"3.83",exp:26,deg:"MS CS",t1:"A: AI/Agentic",t2:"B: Website",src:"Our Algo",val:"3-Source",st:"Invited 3/8",diff:"First-author RAG+CoT publication maps directly to South Peak chatbot. Led 5-person AI team.",iq:"Your RAG+CoT paper is relevant to South Peak. Walk us through your retrieval pipeline.",li:"linkedin.com/in/tsung-yueh-lai",ws:false},
+{r:6,n:"Shravankumar Janawade",c:76,s1:28,s2:10,s3:22,s4:16,gpa:"4.00",exp:22,deg:"MS CS",t1:"B: Website/Frontend",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"React dashboard cut onboarding from 2 weeks to 3 hours. 22mo production. Mentions agentic AI ads.",iq:"You mention agentic AI for advertising. How would you build that for our Google Ads pipeline?",li:"",ws:false},
+{r:7,n:"Vaishnavi Gajarla",c:74,s1:30,s2:8,s3:18,s4:18,gpa:"",exp:24,deg:"MS Data Analytics",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Our Algo",val:"3-Source",st:"Scheduled 3/17 3:25 PM",diff:"Only WordPress production leader in all 323 candidates. #1 in Website Dev algorithm.",iq:"Describe your WordPress Squad Lead role. How did you manage theme customization and deployment?",li:"Verified",ws:false},
+{r:8,n:"Aaron Ashby",c:73,s1:24,s2:8,s3:22,s4:19,gpa:"3.80",exp:19,deg:"BS CS",t1:"B: Website/Frontend",t2:"C: Mobile",src:"Our Algo",val:"3-Source",st:"None",diff:"Next.js + Supabase = Waterside's exact production stack. Tech Lead at Code4Community managing 5 devs.",iq:"Tell us about your Supabase implementation. What auth patterns and real-time features did you use?",li:"Verified",ws:false},
+{r:9,n:"Pratham P. Mahajan",c:72,s1:27,s2:8,s3:19,s4:18,gpa:"3.83",exp:9,deg:"MS Data Science",t1:"E: DS/AI",t2:"A: AI",src:"Our Algo",val:"3-Source+WS",st:"None",diff:"#2 in DS/AI algorithm. Published ML researcher. Work sample submitted.",iq:"Walk us through your research methodology. How do you balance accuracy vs deployment?",li:"Verified",ws:true},
+{r:10,n:"Pratham Satani",c:71,s1:12,s2:23,s3:18,s4:18,gpa:"",exp:0,deg:"MS CS",t1:"B: Website/Frontend",t2:"A: AI",src:"Both Evals",val:"Colleague Only",st:"None",diff:"Colleague's #2 pick. NUworks data-only. Strong endorsement. S3 re-scored (no LI penalty).",iq:"Your colleague spoke highly of you. Tell us about your strongest technical project.",li:"",ws:false},
+{r:11,n:"Alexander McGreevy",c:70,s1:28,s2:8,s3:18,s4:16,gpa:"3.53",exp:12,deg:"BS CS",t1:"C: Mobile",t2:"B: Website",src:"Our Algo",val:"3-Source",st:"Scheduled 3/10 4:30 PM",diff:"React Native + Firebase + Expo — exact Waterside mobile stack. Thesis-level mobile work.",iq:"You built mobile apps with React Native + Firebase. Walk us through your state management.",li:"Verified",ws:false},
+{r:12,n:"Krishnakumar Vijayasankar",c:70,s1:18,s2:16,s3:22,s4:14,gpa:"",exp:34,deg:"MS Applied AI",t1:"A: AI/Agentic",t2:"C: Mobile",src:"New Apps",val:"Provisional+LI",st:"None",diff:"Ford Motor 1yr 10mo production AI. Oracle Cloud + GCP certified. Most enterprise AI experience.",iq:"At Ford, how did you deploy ML models to production? What monitoring patterns?",li:"Verified",ws:false},
+{r:13,n:"Mohammed Ahnaf Tajwar",c:69,s1:12,s2:22,s3:18,s4:17,gpa:"3.67",exp:20,deg:"MS CS",t1:"A: AI/Agentic",t2:"B: Website",src:"Both Evals",val:"3-Source",st:"None",diff:"Colleague's #3 pick. Google CSSI alum. Confirmed GitHub activity.",iq:"Tell us about your Google CSSI experience. How did that shape your engineering approach?",li:"Verified",ws:false},
+{r:14,n:"Samantha Susan John",c:69,s1:12,s2:25,s3:14,s4:18,gpa:"",exp:6,deg:"MS",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Both Evals",val:"3-Source",st:"Invited 3/8",diff:"Colleague's #1 pick. SWE intern experience. Highest Signal 2 score in pool.",iq:"Your colleague rated you their top pick. What would you bring to a small team?",li:"Verified",ws:false},
+{r:15,n:"Saurabh Lohokare",c:66,s1:26,s2:8,s3:18,s4:14,gpa:"4.00",exp:14,deg:"MS CS",t1:"B: Website/Frontend",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"4.0 GPA. TypeScript analytics platform for automotive clients. Mentions agentic AI workflows.",iq:"Walk us through a system you built with autonomous decision-making.",li:"",ws:false},
+{r:16,n:"Yiying Zhang",c:66,s1:20,s2:16,s3:16,s4:14,gpa:"",exp:0,deg:"MS",t1:"D: Mktg/AdTech",t2:"B: Website",src:"New Apps",val:"Provisional+LI",st:"None",diff:"Career changer. NLP + data viz focus. Google Analytics noted.",iq:"What from your previous career gives you an edge in software engineering?",li:"linkedin.com/in/zhang-yiying",ws:false},
+{r:17,n:"Alex Joseph",c:65,s1:8,s2:20,s3:22,s4:15,gpa:"",exp:48,deg:"MS",t1:"A: AI/Agentic",t2:"B: Website",src:"Both Evals",val:"3-Source",st:"None",diff:"4 years SWE experience. Most total experience after Sankar. Colleague's #4.",iq:"What's the most complex system you've architected?",li:"Verified",ws:false},
+{r:18,n:"Anusha Narang",c:65,s1:10,s2:18,s3:17,s4:20,gpa:"",exp:12,deg:"MS",t1:"D: Mktg/AdTech",t2:"B: Website",src:"Both Evals",val:"3-Source+WS",st:"None",diff:"Moderate signals. Work sample submitted. S4 max for work sample + intangibles.",iq:"Tell us about a project where you learned a new technology quickly.",li:"Verified",ws:true},
+{r:19,n:"Coleman Grustas",c:65,s1:20,s2:18,s3:12,s4:15,gpa:"",exp:0,deg:"BS",t1:"C: Mobile",t2:"B: Website",src:"New Apps",val:"Provisional+WS",st:"Invited 3/8",diff:"First co-op, HVAC background. Submitted work sample — shows initiative.",iq:"What projects or coursework demonstrate your readiness?",li:"linkedin.com/in/coleman-grustas",ws:true},
+{r:20,n:"Helly Niteshbhai Diyora",c:64,s1:24,s2:8,s3:18,s4:14,gpa:"3.50",exp:18,deg:"MS CS",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"Triple-framework frontend (React + Vue + Angular). Mentions HubSpot API. 3 dev roles.",iq:"Which framework would you pick for our marketing sites and why?",li:"",ws:false},
+{r:21,n:"Mahek Ravi Nagdev",c:64,s1:24,s2:8,s3:18,s4:14,gpa:"3.67",exp:14,deg:"MS CS",t1:"B: Website/Frontend",t2:"E: DS/AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"SDE + Frontend + Software Dev — 3 technical roles. Strong frontend alignment.",iq:"Walk us through a frontend architecture decision you made.",li:"",ws:false},
+{r:22,n:"Amrin Bushra Taj",c:64,s1:22,s2:8,s3:20,s4:14,gpa:"4.00",exp:16,deg:"MS IS",t1:"A: AI/Agentic",t2:"B: Website",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"4.0 GPA MS IS. Product Engineer + CTO roles. ML/Deep Learning background.",iq:"Walk us through a technical architecture decision and its business impact.",li:"",ws:false},
+{r:23,n:"Atul Kumar Tiwary",c:62,s1:8,s2:24,s3:14,s4:16,gpa:"",exp:0,deg:"MS",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Both Evals",val:"Colleague+NUworks",st:"None",diff:"Colleague's high pick. S3 re-scored from NUworks data (no LinkedIn penalty).",iq:"What project are you most proud of and why?",li:"Verified",ws:false},
+{r:24,n:"Lauren Brissette",c:62,s1:22,s2:4,s3:19,s4:17,gpa:"4.00",exp:6,deg:"BS",t1:"B: Website/Frontend",t2:"C: Mobile",src:"Our Algo",val:"3-Source+WS",st:"Invited 3/7",diff:"4.0 GPA, Honors Program, SWE intern. Work sample. Low S2 (no colleague review).",iq:"How do you apply academic rigor to real-world engineering problems?",li:"Verified",ws:true},
+{r:25,n:"Ayush Varma",c:61,s1:10,s2:20,s3:18,s4:13,gpa:"",exp:12,deg:"MS",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Both Evals",val:"3-Source",st:"None",diff:"Colleague's #5 pick. Moderate tech alignment. Solid colleague endorsement.",iq:"How does your interest align with WordPress and CRM?",li:"Verified",ws:false},
+{r:26,n:"Ayush Adhikari",c:60,s1:20,s2:14,s3:14,s4:12,gpa:"",exp:18,deg:"BS",t1:"A: AI/Agentic",t2:"B: Website",src:"New Apps",val:"Provisional+LI",st:"None",diff:"Fidelity + Harvard Law + Amazon experience. Strong pedigree.",iq:"What's the common thread in your technical growth?",li:"Verified",ws:false},
+{r:27,n:"Connor Tessaro",c:60,s1:20,s2:14,s3:14,s4:12,gpa:"",exp:12,deg:"BS CS+Math",t1:"D: Mktg/AdTech",t2:"B: Website",src:"New Apps",val:"Provisional+LI",st:"Invited 3/8",diff:"Chewy + Disrupt FinTech. CS+Math dual. Analytics-oriented.",iq:"At Chewy, what data or analytics challenges did you tackle?",li:"Verified",ws:false},
+{r:28,n:"Tejashree Arcot Jayakumar",c:60,s1:16,s2:14,s3:18,s4:12,gpa:"",exp:30,deg:"MS",t1:"B: Website/Backend",t2:"A: AI",src:"New Apps",val:"Provisional+LI",st:"None",diff:"Claims 2.5yr Bosch experience + published paper. No SharePoint materials.",iq:"Tell us about your Bosch role and specific contribution.",li:"Verified",ws:false},
+{r:29,n:"Ella Pitts",c:58,s1:18,s2:16,s3:12,s4:12,gpa:"",exp:3,deg:"MS Align",t1:"D: Mktg/AdTech",t2:"B: Website",src:"New Apps",val:"Provisional+LI",st:"None",diff:"Career changer via Align. Research assistant. Jun 2026-Jan 2027.",iq:"What motivated your transition to CS?",li:"linkedin.com/in/ellapitts",ws:false},
+{r:30,n:"Gaurav Gurunath Choughule",c:58,s1:22,s2:8,s3:16,s4:12,gpa:"3.67",exp:14,deg:"MS IS",t1:"B: Website/Frontend",t2:"E: DS/AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"Dedicated React + Frontend Developer roles. Data analytics coursework.",iq:"Walk us through your approach to component architecture.",li:"",ws:false},
+{r:31,n:"Mihalis Koutouvos",c:58,s1:22,s2:8,s3:16,s4:12,gpa:"",exp:12,deg:"BS CS",t1:"B: Website/Frontend",t2:"C: Mobile",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"React/TypeScript production experience from SWE Co-Op. BS CS Senior.",iq:"What production React work did you ship?",li:"",ws:false},
+{r:32,n:"Preethi Shyamsundar",c:57,s1:8,s2:18,s3:17,s4:14,gpa:"",exp:18,deg:"MS",t1:"B: Website/Backend",t2:"D: Mktg/AdTech",src:"Both Evals",val:"3-Source",st:"None",diff:"Colleague reviewed. Moderate tech alignment. Decent experience depth.",iq:"What backend technologies are you most comfortable with?",li:"Verified",ws:false},
+{r:33,n:"Rachit Manubhai Patel",c:57,s1:18,s2:8,s3:16,s4:15,gpa:"3.80",exp:18,deg:"MS CS",t1:"B: Website/Backend",t2:"A: AI",src:"Our Algo",val:"AlgoV1+WS",st:"None",diff:"3.80 GPA. SDE Intern + Backend Dev + Research Asst. Work sample.",iq:"Walk us through your backend development work.",li:"",ws:true},
+{r:34,n:"Hailey Salce",c:56,s1:20,s2:8,s3:14,s4:14,gpa:"3.60",exp:12,deg:"BS CS/Media",t1:"D: Mktg/AdTech",t2:"B: Website",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"CS/Media Arts dual — unique Team D fit. SWE Co-Op + IT. Excellent cover letter.",iq:"How would you build marketing campaign tools with creative UX?",li:"",ws:false},
+{r:35,n:"Raghav Jadia",c:56,s1:20,s2:6,s3:18,s4:12,gpa:"",exp:18,deg:"MS Data Science",t1:"E: DS/AI",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"MS Data Science. Software Dev + DevOps + Data Analyst — 3 roles.",iq:"How would you build a data pipeline for our analytics?",li:"",ws:false},
+{r:36,n:"Cameron Zifcak",c:56,s1:18,s2:14,s3:14,s4:10,gpa:"",exp:0,deg:"BS",t1:"C: Mobile",t2:"B: Website",src:"New Apps",val:"Provisional+LI",st:"None",diff:"No tech experience. Thin profile.",iq:"What gives you confidence for a production codebase?",li:"linkedin.com/in/cameronz",ws:false},
+{r:37,n:"Agnel Anil Salve",c:56,s1:20,s2:8,s3:16,s4:12,gpa:"3.67",exp:14,deg:"MS CS",t1:"B: Website/Frontend",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"Software Dev + Junior Dev + Intern. CL mentions web impact.",iq:"What's the most impactful web app you've built?",li:"",ws:false},
+{r:38,n:"Chandra Shekar Reddy K.",c:55,s1:8,s2:18,s3:17,s4:12,gpa:"",exp:24,deg:"MS",t1:"B: Website/Backend",t2:"D: Mktg/AdTech",src:"Both Evals",val:"3-Source",st:"None",diff:"Colleague reviewed. 2yr experience.",iq:"What's the largest codebase you've worked in?",li:"Verified",ws:false},
+{r:39,n:"Soham Himanshubhai Padia",c:55,s1:18,s2:8,s3:14,s4:15,gpa:"",exp:12,deg:"MS CS",t1:"B: Website/Backend",t2:"E: DS/AI",src:"Our Algo",val:"AlgoV1+WS",st:"None",diff:"Associate SWE + SDE Intern. Work sample. ML coursework.",iq:"Walk us through your work sample.",li:"",ws:true},
+{r:40,n:"Rajiv Philip",c:55,s1:18,s2:8,s3:14,s4:15,gpa:"",exp:12,deg:"BS CS",t1:"C: Mobile",t2:"B: Website",src:"Our Algo",val:"AlgoV1+WS",st:"None",diff:"SWE Co-Op + Mobile Dev Intern. Work sample submitted.",iq:"Tell us about your mobile development internship.",li:"",ws:true},
+{r:41,n:"Jaisweta Naarrayanan",c:54,s1:18,s2:8,s3:16,s4:12,gpa:"",exp:14,deg:"MS Data Science",t1:"E: DS/AI",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"Data Scientist + Analyst Intern. NLP + ML experience.",iq:"Walk us through an NLP project you've built.",li:"",ws:false},
+{r:42,n:"Victor Li",c:54,s1:20,s2:8,s3:14,s4:12,gpa:"3.53",exp:12,deg:"BS CS/Business",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"CS/Business dual — relevant to Waterside model. React + TypeScript.",iq:"How do you think about the business side of engineering?",li:"",ws:false},
+{r:43,n:"Rishi Koduri",c:52,s1:18,s2:8,s3:14,s4:12,gpa:"",exp:12,deg:"MS CS",t1:"A: AI/Agentic",t2:"B: Website",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"Software Engineer + ML Intern. Mentions production software.",iq:"Tell us about your ML internship.",li:"",ws:false},
+{r:44,n:"Vansh Samaiya",c:52,s1:18,s2:8,s3:14,s4:12,gpa:"3.44",exp:12,deg:"MS CS",t1:"B: Website/Backend",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"Software Engineer + Backend Dev. Mentions production-grade code.",iq:"What does production-grade code mean to you?",li:"",ws:false},
+{r:45,n:"Jaykumar Rameshbhai Bhuva",c:51,s1:16,s2:8,s3:12,s4:15,gpa:"3.67",exp:10,deg:"MS IS",t1:"B: Website/Frontend",t2:"C: Mobile",src:"Our Algo",val:"AlgoV1+WS",st:"None",diff:"Student IT + SWE. Work sample. CL mentions React Native.",iq:"What React Native projects have you worked on?",li:"",ws:true},
+{r:46,n:"Nikhil Dilip Kachhela",c:50,s1:16,s2:8,s3:14,s4:12,gpa:"4.00",exp:12,deg:"MS CS",t1:"B: Website/Frontend",t2:"E: DS/AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"4.0 GPA. Software Developer + ML Engineer Intern.",iq:"What's the difference between academic and production software?",li:"",ws:false},
+{r:47,n:"Akshay M. Ramesh",c:49,s1:8,s2:16,s3:12,s4:13,gpa:"",exp:6,deg:"MS",t1:"B: Website/Frontend",t2:"D: Mktg/AdTech",src:"Both Evals",val:"Colleague+WS",st:"None",diff:"S3 re-scored (no LinkedIn penalty). Work sample submitted.",iq:"Walk us through your work sample.",li:"Verified",ws:true},
+{r:48,n:"Akshaya Radhakrishnan",c:48,s1:18,s2:8,s3:10,s4:12,gpa:"",exp:6,deg:"BS CS/BehavNeuro",t1:"C: Mobile",t2:"A: AI",src:"Our Algo",val:"AlgoV1+Resume",st:"None",diff:"CS/Behavioral Neuroscience dual. App Developer Intern.",iq:"Tell us about your app development internship.",li:"",ws:false},
+{r:49,n:"Shreya Kishor",c:44,s1:4,s2:14,s3:16,s4:10,gpa:"",exp:12,deg:"MS",t1:"D: Mktg/AdTech",t2:"B: Website",src:"Both Evals",val:"3-Source",st:"None",diff:"Low tech alignment. Colleague reviewed. Marketing analytics potential.",iq:"What experience do you have with Google Ads, GA4, or HubSpot?",li:"Verified",ws:false},
+{r:50,n:"Chris Wang",c:42,s1:14,s2:8,s3:10,s4:10,gpa:"",exp:0,deg:"Unknown",t1:"B: Website/Frontend",t2:"A: AI",src:"New Apps",val:"Resume+LI",st:"None",diff:"March applicant. LinkedIn found in resume. Needs deeper evaluation.",iq:"Walk us through your strongest technical project.",li:"linkedin.com/in/chriswang87",ws:false}
+];
+const teams=[
+{name:"A: AI & Agentic Automation",positions:3,stack:"Claude API, OpenAI embeddings, Pinecone/pgvector, RAG chatbot, n8n workflows",primary:["Tsung-Yueh (Eric) Lai","Krishnakumar Vijayasankar","Jaiman Pandya"],alternates:["Mohammed Ahnaf Tajwar","Alex Joseph","Amrin Bushra Taj"]},
+{name:"B: Website & Frontend Dev",positions:3,stack:"WordPress (Avada + GeneratePress), ACF Pro, GSAP, PHP, React, Next.js, Supabase",primary:["Ansh Sumeet Sarin","Vaishnavi Gajarla","Aaron Ashby"],alternates:["Shravankumar Janawade","Lauren Brissette","Thejesh Mundlapati"]},
+{name:"C: Mobile App Dev",positions:2,stack:"React Native, Expo, Firebase, Supabase, Twilio",primary:["Sankar Sudheer Ayachitula","Alexander McGreevy"],alternates:["Coleman Grustas","Rajiv Philip","Akshaya Radhakrishnan"]},
+{name:"D: Digital Marketing, Ad Analytics & CRM",positions:2,stack:"Google Ads, Meta Ads, SEO, AIO visibility, geofencing, custom audiences, automation, HubSpot, GA4, Meta Pixel",primary:["Connor Tessaro","Hailey Salce"],alternates:["Anusha Narang","Ella Pitts","Yiying Zhang"]}
+];
+const risks=[
+{title:"Team D Skills Gap",desc:"Expanded scope (Google Ads, Meta Ads, SEO, AIO, geofencing) — few candidates have direct experience in all areas.",sev:"high",action:"Screen for marketing analytics aptitude and willingness to learn marketing tech in interviews."},
+{title:"20 New Candidates Unverified",desc:"20 candidates added from Algorithm V1 without colleague review or LinkedIn deep-dive.",sev:"medium",action:"Prioritize interviews for top-ranked new candidates. Request portfolios."},
+{title:"No SharePoint Materials (5)",desc:"Aaron Ashby, Krishnakumar V., Ayush Adhikari, Tejashree A.J., Chandra Shekar — no files.",sev:"medium",action:"Ask in interview about application materials."},
+{title:"Thin Experience (4)",desc:"Coleman Grustas, Cameron Zifcak, Chris Wang, Suhani Kashyap — minimal tech experience.",sev:"medium",action:"Focus on learning aptitude, personal projects, and coursework."},
+{title:"Availability Mismatches (3)",desc:"Jaiman Pandya (May start), Ella Pitts (Jun-Jan), Cameron Zifcak (Jun start).",sev:"low",action:"Confirm exact dates and flexibility."},
+{title:"Unverified Claims (3)",desc:"Tejashree (2.5yr Bosch), Atul Tiwary (thin LinkedIn), Amrin Bushra Taj (CTO claim).",sev:"medium",action:"Request portfolio/references in interview."},
+{title:"Work Sample Gap (39 of 50)",desc:"39 of 50 candidates did not submit work samples.",sev:"low",action:"Consider requesting samples from top candidates."},
+{title:"Algorithm Bias Toward MS Students",desc:"Algorithm v1 weighted grad students favorably. 60%+ are MS students.",sev:"low",action:"Review BS candidates like Ashby (#8), Pandya (#3) holistically."}
+];
+function getTierClass(r){if(r<=15)return'tier-1';if(r<=30)return'tier-2';if(r<=40)return'tier-3';return'tier-4'}
+function getStatusClass(s){if(s.includes('Scheduled'))return'tag-status-scheduled';if(s.includes('Invited'))return'tag-status-invited';return'tag-status-none'}
+function getStatusLabel(s){if(s.includes('Scheduled'))return s;if(s.includes('Invited'))return s;return'No Contact'}
+function renderCandidates(list){
+document.getElementById('candidateList').innerHTML=list.map(c=>'<div class="cand-card '+getTierClass(c.r)+'" onclick="toggleDetail(this)"><div class="cand-top"><span class="cand-rank">#'+c.r+'</span><span class="cand-name">'+c.n+'</span><span class="cand-score">'+c.c+'</span></div><div class="cand-meta"><span class="cand-tag tag-team">'+c.t1+'</span>'+(c.deg?'<span class="cand-tag tag-degree">'+c.deg+'</span>':'')+(c.gpa?'<span class="cand-tag tag-gpa">GPA '+c.gpa+'</span>':'')+(c.exp?'<span class="cand-tag tag-exp">'+c.exp+'mo exp</span>':'')+'<span class="cand-tag '+getStatusClass(c.st)+'">'+getStatusLabel(c.st)+'</span>'+(c.ws?'<span class="cand-tag tag-worksample">Work Sample</span>':'')+(c.li?'<span class="cand-tag tag-linkedin">LinkedIn</span>':'')+'</div><div class="cand-signals"><div class="signal"><div class="s-val">'+c.s1+'</div><div class="s-label">Tech (30)</div></div><div class="signal"><div class="s-val">'+c.s2+'</div><div class="s-label">Quality (25)</div></div><div class="signal"><div class="s-val">'+c.s3+'</div><div class="s-label">Exp (25)</div></div><div class="signal"><div class="s-val">'+c.s4+'</div><div class="s-label">Intang (20)</div></div></div><div class="cand-detail"><div class="detail-row"><strong>Differentiator:</strong><span>'+c.diff+'</span></div><div class="detail-row"><strong>Interview Question:</strong><span>'+c.iq+'</span></div><div class="detail-row"><strong>Flex Team:</strong><span>'+c.t2+'</span></div><div class="detail-row"><strong>Source:</strong><span>'+c.src+' | '+c.val+'</span></div>'+(c.li?'<div class="detail-row"><strong>LinkedIn:</strong><span>'+c.li+'</span></div>':'')+'</div></div>').join('');
+document.getElementById('resultCount').textContent=list.length+' candidate'+(list.length!==1?'s':'');
+}
+function toggleDetail(el){el.querySelector('.cand-detail').classList.toggle('open')}
+function filterCandidates(){
+var q=document.getElementById('searchInput').value.toLowerCase(),team=document.getElementById('teamFilter').value,status=document.getElementById('statusFilter').value;
+var f=candidates.filter(function(c){
+if(q&&c.n.toLowerCase().indexOf(q)<0&&c.diff.toLowerCase().indexOf(q)<0&&c.deg.toLowerCase().indexOf(q)<0)return false;
+if(team&&c.t1.indexOf(team)<0&&c.t2.indexOf(team)<0)return false;
+if(status==='Scheduled'&&c.st.indexOf('Scheduled')<0)return false;
+if(status==='Invited'&&c.st.indexOf('Invited')<0)return false;
+if(status==='None'&&(c.st.indexOf('Scheduled')>=0||c.st.indexOf('Invited')>=0))return false;
+return true;
+});
+renderCandidates(f);
+}
+function renderTeams(){
+document.getElementById('view-teams').innerHTML=teams.map(function(t){
+var members=t.primary.map(function(n){var c=candidates.find(function(x){return x.n===n});return{name:n,score:c?c.c:'-',role:'PRIMARY'}}).concat(t.alternates.map(function(n){var c=candidates.find(function(x){return x.n===n});return{name:n,score:c?c.c:'-',role:'ALT'}}));
+return'<div class="team-section"><div class="team-header">'+t.name+' ('+t.positions+' positions)<small>'+t.stack+'</small></div><div class="team-body">'+members.map(function(m){return'<div class="team-member"><span class="team-role '+(m.role==='PRIMARY'?'role-primary':'role-alt')+'">'+m.role+'</span><span class="tm-name">'+m.name+'</span><span class="tm-score">'+m.score+'</span></div>'}).join('')+'</div></div>';
+}).join('');
+}
+function renderAlgorithm(){
+document.getElementById('view-algorithm').innerHTML='<div class="revision-banner"><strong>REVISED 3/8/2026:</strong> Signal 3 renamed to "Experience Depth." No LinkedIn = NO penalty. Candidates scored on verifiable experience from any source. Team D expanded to include Google Ads, Meta Ads, SEO, AIO visibility, geofencing, custom audiences, automation, and reporting.</div><div class="algo-signal-grid"><div class="algo-signal"><div class="sig-name">Signal 1: Tech Alignment</div><div class="sig-max">0-30</div><div class="sig-desc">NUworks + resume keywords vs Waterside stack (React Native, Supabase, WordPress, Claude API, HubSpot, GA4, Google Ads, Meta Ads, SEO)</div></div><div class="algo-signal"><div class="sig-name">Signal 2: Application Quality</div><div class="sig-max">0-25</div><div class="sig-desc">Colleague review scores + resume/cover letter quality. Top picks weighted heavily.</div></div><div class="algo-signal"><div class="sig-name">Signal 3: Experience Depth</div><div class="sig-max">0-25</div><div class="sig-desc">Experience months, role quality, certs from ANY source. No LinkedIn penalty.</div></div><div class="algo-signal"><div class="sig-name">Signal 4: Intangibles</div><div class="sig-max">0-20</div><div class="sig-desc">Work samples (+3), early application, unique skills, trajectory, dual-major bonus.</div></div></div><div class="algo-card" style="margin-top:16px"><h3>Data Sources Verified</h3><p><strong>NUworks:</strong> 323 applicants for Position #150257</p><p><strong>SharePoint:</strong> 832 files, 343 entries, 45 with work samples</p><p><strong>Algorithm V1:</strong> 29 candidates scored across 5 concentrations</p><p><strong>LinkedIn:</strong> 29 of 50 verified; 15+ URLs from resumes</p><p><strong>Outlook:</strong> 4 scheduled interviews + 6 invitations</p><p><strong>PDF Extractions:</strong> 62 PDFs processed</p></div><div class="algo-card"><h3>Validation Levels</h3><p><strong>3-Source:</strong> Algorithm + Colleague + LinkedIn</p><p><strong>3-Source+WS:</strong> 3-Source + work sample</p><p><strong>AlgoV1+Resume:</strong> Algorithm v1 + resume/CL (new candidates)</p><p><strong>AlgoV1+WS:</strong> Algorithm v1 + work sample</p><p><strong>Provisional+LI:</strong> Application + LinkedIn (no colleague review)</p><p><strong>Colleague Only/+NUworks:</strong> Colleague review without LinkedIn</p></div>';
+}
+function renderRisks(){
+document.getElementById('view-risks').innerHTML=risks.map(function(r){return'<div class="risk-card sev-'+r.sev+'"><div class="risk-title">'+r.title+'</div><div class="risk-desc">'+r.desc+'</div><div class="risk-action"><strong>Action:</strong> '+r.action+'</div></div>'}).join('');
+}
+function showView(view){
+document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+event.target.classList.add('active');
+['ranking','teams','algorithm','risks'].forEach(function(v){
+document.getElementById('view-'+v).classList.toggle('hidden',v!==view);
+});
+}
+renderCandidates(candidates);renderTeams();renderAlgorithm();renderRisks();
+</script>
+</body>
+</html>
