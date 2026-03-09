@@ -213,7 +213,7 @@ function toggleDetail(el){el.querySelector('.cand-detail').classList.toggle('ope
 function filterCandidates(){
 var q=document.getElementById('searchInput').value.toLowerCase(),team=document.getElementById('teamFilter').value,status=document.getElementById('statusFilter').value;
 var f=candidates.filter(function(c){
-if(q&&c.n.toLowerCase().indexOf(q)<0&&c.diff.toLowerCase().indexOf(q)<0&&c.deg.toLowerCase().indexOf(q)<0)return false;
+if(q&&c.n.toLTESTowerCase().indexOf(q)<0&&c.diff.toLowerCase().indexOf(q)<0&&c.deg.toLowerCase().indexOf(q)<0)return false;
 if(team&&c.t1.indexOf(team)<0&&c.t2.indexOf(team)<0)return false;
 if(status==='Scheduled'&&c.st.indexOf('Scheduled')<0)return false;
 if(status==='Invited'&&c.st.indexOf('Invited')<0)return false;
